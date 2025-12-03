@@ -15,7 +15,7 @@ object RetrofitClient {
     // '10.0.2.2' es la IP especial que usa el emulador de Android
     // Si usas un dispositivo Android físico, debes reemplazar esto con
     // la IP local de tu PC (ej: 172.28.84.39) o un dominio.
-    private const val BASE_URL = "http://172.28.80.14:3000/"
+    private const val BASE_URL = "http://10.195.35.131:3000/"
 
     // Inicialización perezosa (lazy) de la instancia de Retrofit.
     private val retrofit: Retrofit by lazy {
