@@ -1,8 +1,27 @@
+// Importaciones necesarias para manejar archivos y propiedades
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
+
+// =========================================================================================
+// 🎯 CONFIGURACIÓN DE FIRMA: CARGA DE PROPIEDADES (1/3)
+// Carga las contraseñas del archivo keystore.properties de la raíz del proyecto.
+// =========================================================================================
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties()
+
+if (keystorePropertiesFile.exists()) {
+    FileInputStream(keystorePropertiesFile).use {
+        keystoreProperties.load(it)
+    }
+}
+// =========================================================================================
+
 
 android {
     namespace = "com.example.supermarketlistapp"
@@ -18,8 +37,28 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // =========================================================================================
+    // 🎯 CONFIGURACIÓN DE FIRMA: DEFINICIÓN DE SIGNINGCONFIGS (2/3)
+    // Definimos la configuración 'release' para que use las propiedades cargadas.
+    // =========================================================================================
+    signingConfigs {
+        create("release") {
+            if (keystoreProperties.containsKey("storeFile")) {
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
+    // =========================================================================================
+
     buildTypes {
         release {
+            // 🎯 CONFIGURACIÓN DE FIRMA: APLICACIÓN DE LA FIRMA (3/3)
+            // Asigna la configuración de firma 'release' al tipo de compilación 'release'.
+            signingConfig = signingConfigs.getByName("release")
+
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
